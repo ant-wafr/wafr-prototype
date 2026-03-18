@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wafr — Mobile Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root {
+  --bg-primary: #0A0C11;
+  --bg-surface: #121518;
+  --bg-surface-elevated: #1A1E24;
+  --bg-card: #171B21;
+  --border-primary: #2A3040;
+  --border-secondary: #1E2430;
+  --emerald-primary: #0D6B4F;
+  --emerald-light: #1A8F6A;
+  --emerald-dark: #0B3D2E;
+  --accent: #90EE90;
+  --accent-dark: #0A2A0A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9A9A9A;
+  --text-tertiary: #666666;
+  --error: #E74C3C;
+  --success: #2ECC71;
+  --warning: #F39C12;
+  --info: #3498DB;
+  --wallet-bg: #46484b;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  background: #111;
+  font-family: 'Inter', -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+body[dir="rtl"] { font-family: 'Noto Sans Arabic', 'Inter', sans-serif; }
+
+.phone-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.phone-frame {
+  width: 393px;
+  height: 852px;
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 2px #2a2a2a, 0 0 80px rgba(0,0,0,0.6);
+  background: var(--bg-primary);
+}
+.screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(180deg, #191D24 0%, #0D1016 100%);
+}
+.screen.active { display: flex; }
+.screen.slide-in {
+  display: flex;
+  animation: slideIn 0.28s cubic-bezier(.4,0,.2,1) forwards;
+}
+.screen.slide-out {
+  display: flex;
+  animation: slideOut 0.28s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0.8; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-30%); opacity: 0.5; }
+}
+body[dir="rtl"] .screen.slide-in { animation-name: slideInRTL; }
+body[dir="rtl"] .screen.slide-out { animation-name: slideOutRTL; }
+@keyframes slideInRTL {
+  from { transform: translateX(-100%); opacity: 0.8; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOutRTL {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(30%); opacity: 0.5; }
+}
+
+/* Onboarding has solid dark bg */
+.screen.bg-solid { background: var(--bg-primary); }
+
+/* Status Bar */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px 8px;
+  height: 62px;
+  flex-shrink: 0;
+}
+.status-bar .time {
+  font-weight: 600;
+  font-size: 16px;
+}
+.status-icons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.status-icons i { width: 16px; height: 16px; }
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 56px;
+  flex-shrink: 0;
+}
+.back-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-primary);
+}
+.back-btn:active { background: var(--bg-surface-elevated); }
+.back-btn i { width: 18px; height: 18px; }
+.header .title {
+  font-size: 18px;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+}
+.header .spacer { width: 36px; }
+
+/* Content area */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 24px;
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.content::-webkit-scrollbar { display: none; }
+
+/* Buttons */
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-dark);
+  border: none;
+  border-radius: 999px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+.btn-primary:active { opacity: 0.85; }
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 999px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  width: 100%;
+}
+.btn-sm-green {
+  padding: 10px 16px;
+  font-size: 13px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-dark);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+/* Input */
+.input-group {
+  position: relative;
+  width: 100%;
+}
+.input-group .lbl {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: block;
+}
+.input-field {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: var(--text-primary);
+  font-size: 16px;
+  width: 100%;
+  font-family: inherit;
+  outline: none;
+}
+.input-field:focus { border-color: var(--accent); }
+.input-field-stacked {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 28px 16px 12px;
+  color: var(--text-primary);
+  font-size: 16px;
+  width: 100%;
+  font-family: inherit;
+  outline: none;
+  position: relative;
+}
+.input-float-label {
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+body[dir="rtl"] .input-float-label { left: auto; right: 16px; }
+
+/* Balance Card — light cream card */
+.balance-card {
+  background: #e5e5e5;
+  background-image:
+    repeating-linear-gradient(45deg, transparent, transparent 14px, rgba(0,0,0,0.03) 14px, rgba(0,0,0,0.03) 15px);
+  border-radius: 16px;
+  padding: 24px 20px;
+  border: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.balance-card .bal-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #3c3f47;
+}
+.balance-card .bal-amount {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  font-size: 40px;
+  font-weight: 500;
+  color: #1A1A1A;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+.balance-card .bal-change {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #018b33;
+}
+.balance-card .bal-change i { width: 14px; height: 14px; color: #16A34A; }
+
+/* Tab Bar — pill style */
+.tab-bar-wrap {
+  padding: 12px 21px 21px;
+  flex-shrink: 0;
+}
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-surface);
+  border-radius: 36px;
+  border: 1px solid var(--border-primary);
+  height: 62px;
+  padding: 4px;
+  overflow: hidden;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  background: none;
+  border: none;
+  border-radius: 26px;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.tab-item.active {
+  background: rgba(255,255,255,0.22);
+  color: var(--accent-dark);
+}
+.tab-item.active i { color: var(--accent-dark); }
+.tab-item i { width: 18px; height: 18px; }
+
+/* PIN */
+.pin-display {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 20px 0 32px;
+}
+.pin-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--text-tertiary);
+  transition: all 0.15s;
+}
+.pin-dot.filled {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 0 32px;
+  margin-bottom: 16px;
+}
+.pin-key {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated);
+  border: none;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  font-family: inherit;
+}
+.pin-key:active { background: var(--accent); color: var(--accent-dark); }
+.pin-key.empty { background: transparent; cursor: default; }
+.pin-key i { width: 20px; height: 20px; }
+
+/* Step */
+.step-text { color: var(--text-secondary); font-size: 13px; }
+
+/* OTP */
+.otp-row { display: flex; gap: 12px; justify-content: center; margin: 20px 0; }
+.otp-box {
+  width: 48px; height: 56px;
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 600;
+}
+.otp-box.filled { border-color: var(--accent); }
+
+/* Safe area */
+.safe-area { height: 34px; flex-shrink: 0; }
+
+/* Avatar */
+.avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600;
+  flex-shrink: 0;
+  background: rgba(144,238,144,0.15);
+  color: var(--accent);
+  border: 1px solid rgba(144,238,144,0.2);
+}
+
+/* Wallet cards */
+.wallets-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.wallets-scroll::-webkit-scrollbar { display: none; }
+.wallet-card {
+  min-width: 140px;
+  padding: 16px;
+  background: var(--wallet-bg);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
+.wallet-card .wc-flag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wallet-card .wc-flag {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  overflow: hidden;
+}
+.wallet-card .wc-code {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.wallet-card .wc-amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.wallet-card-sm {
+  min-width: 100px;
+  padding: 12px;
+  background: var(--wallet-bg);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-primary);
+  flex-shrink: 0;
+}
+.wallet-card-sm .wc-code { font-size: 12px; font-weight: 500; }
+.wallet-card-sm .wc-amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+/* Quick action buttons */
+.quick-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+.qa-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  flex: 1;
+}
+.qa-icon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qa-icon i { width: 22px; height: 22px; color: var(--accent-dark); }
+.qa-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Section header */
+.section-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.section-hdr .sec-title { font-size: 16px; font-weight: 500; }
+.section-hdr .sec-link { font-size: 13px; font-weight: 500; color: #9CA3AF; cursor: pointer; }
+
+/* Promo banner */
+.promo-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.promo-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.promo-icon i { width: 20px; height: 20px; color: var(--accent-dark); }
+
+/* Transaction item */
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.tx-item:last-child { border-bottom: none; }
+.tx-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.tx-icon i { width: 18px; height: 18px; color: var(--text-secondary); }
+.tx-info { flex: 1; }
+.tx-name { font-size: 14px; font-weight: 500; }
+.tx-meta { font-size: 12px; color: var(--text-secondary); }
+.tx-right { text-align: right; }
+body[dir="rtl"] .tx-right { text-align: left; }
+.tx-amount { font-size: 14px; font-weight: 600; }
+.tx-status { font-size: 11px; color: var(--accent); }
+
+/* Amount display */
+.amount-display {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cur-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.cur-flag {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.amount-val {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: right;
+  flex: 1;
+}
+body[dir="rtl"] .amount-val { text-align: left; }
+
+/* Swap button */
+.swap-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  color: var(--accent-dark);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -8px auto;
+  position: relative;
+  z-index: 1;
+}
+.swap-btn i { width: 20px; height: 20px; }
+
+/* Review row */
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 14px;
+}
+.review-row .rlbl { color: var(--text-secondary); }
+.review-row .rval { font-weight: 500; }
+.review-row .rval.highlight { color: var(--accent); }
+
+/* Savings card */
+.savings-card {
+  background: rgba(144,238,144,0.06);
+  border: 1px solid rgba(144,238,144,0.15);
+  border-radius: 12px;
+  padding: 16px;
+}
+.savings-hdr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.savings-hdr i { width: 16px; height: 16px; color: var(--accent); }
+.savings-hdr span { font-size: 14px; font-weight: 600; }
+.savings-total { font-size: 13px; font-weight: 600; color: var(--accent); margin-top: 8px; }
+
+/* Contact row */
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.contact-row:last-child { border-bottom: none; }
+.contact-info { flex: 1; }
+.contact-name { font-size: 15px; font-weight: 500; }
+.contact-sub { font-size: 12px; color: var(--text-secondary); }
+
+/* Shariah badge */
+.shariah-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+/* Credit card */
+.credit-card {
+  background: linear-gradient(135deg, var(--bg-surface-elevated) 0%, var(--bg-surface) 100%);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+}
+.cc-brand { position: absolute; top: 20px; right: 20px; font-size: 16px; font-weight: 700; color: var(--text-secondary); }
+body[dir="rtl"] .cc-brand { right: auto; left: 20px; }
+.cc-name { font-size: 14px; font-weight: 500; margin-bottom: 16px; }
+.cc-number { font-size: 16px; font-weight: 500; letter-spacing: 2px; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
+.cc-expiry { font-size: 13px; color: var(--text-secondary); }
+.cc-holder { font-size: 12px; color: var(--text-secondary); margin-top: 12px; letter-spacing: 1px; }
+.cc-currency { font-size: 12px; color: var(--text-secondary); position: absolute; bottom: 20px; right: 20px; }
+body[dir="rtl"] .cc-currency { right: auto; left: 20px; }
+
+/* Card actions */
+.card-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.card-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 90px;
+  font-family: inherit;
+  border: 1px solid var(--border-primary);
+}
+.card-action-btn i { width: 18px; height: 18px; }
+
+/* Wallet selection row */
+.wallet-select-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.wallet-select-row:active { background: var(--bg-surface-elevated); }
+.wallet-select-row.selected {
+  border-color: var(--accent);
+  background: rgba(144,238,144,0.06);
+}
+
+/* Add money option */
+.add-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.add-option:active { border-color: var(--text-tertiary); }
+.add-opt-icon {
+  width: 44px; height: 44px;
+  border-radius: 8px;
+  background: rgba(144,238,144,0.12);
+  display: flex; align-items: center; justify-content: center;
+}
+.add-opt-icon i { width: 20px; height: 20px; color: var(--accent); }
+.add-opt-info { flex: 1; }
+.add-opt-title { font-size: 15px; font-weight: 600; }
+.add-opt-desc { font-size: 12px; color: var(--text-secondary); }
+
+/* Settings */
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 0;
+}
+.profile-pic {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated);
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--border-primary);
+  overflow: hidden;
+}
+.profile-pic i { width: 32px; height: 32px; color: var(--text-secondary); }
+.profile-name { font-size: 18px; font-weight: 600; }
+.profile-email { font-size: 13px; color: var(--text-secondary); }
+.settings-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-secondary);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:active { background: var(--bg-surface-elevated); }
+.sr-icon { width: 20px; display: flex; align-items: center; justify-content: center; }
+.sr-icon i { width: 18px; height: 18px; color: var(--text-secondary); }
+.sr-label { flex: 1; font-size: 15px; }
+.sr-value { font-size: 14px; color: var(--text-secondary); }
+.sr-chevron i { width: 14px; height: 14px; color: var(--text-tertiary); }
+
+/* Timeline */
+.timeline { padding-left: 8px; }
+body[dir="rtl"] .timeline { padding-left: 0; padding-right: 8px; }
+.tl-item {
+  display: flex;
+  gap: 14px;
+  padding-bottom: 20px;
+  position: relative;
+}
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 16px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-primary);
+}
+body[dir="rtl"] .tl-item::before { left: auto; right: 5px; }
+.tl-item:last-child::before { display: none; }
+.tl-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.tl-dot.pending { background: var(--text-tertiary); }
+.tl-title { font-size: 14px; font-weight: 600; }
+.tl-time { font-size: 12px; color: var(--text-secondary); }
+.tl-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+/* Success icon */
+.success-circle {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+.success-circle i { width: 36px; height: 36px; color: var(--accent); }
+
+/* Toggle */
+.toggle-track {
+  width: 48px; height: 28px;
+  border-radius: 14px;
+  background: var(--accent);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.toggle-track::after {
+  content: '';
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 3px; right: 3px;
+}
+
+/* Home header */
+.home-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+.home-logo {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent-dark);
+  border: 1px solid var(--border-primary);
+}
+.home-actions { display: flex; gap: 12px; align-items: center; }
+.hdr-icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border: 1px solid var(--border-primary);
+  background: transparent;
+}
+.hdr-icon-btn i { width: 18px; height: 18px; color: var(--text-primary); }
+.hdr-profile-pic {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated);
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+  display: flex; align-items: center; justify-content: center;
+}
+.hdr-profile-pic i { width: 18px; height: 18px; color: var(--text-secondary); }
+
+/* IBAN display */
+.iban-display {
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  border-radius: 8px;
+  font-size: 12px;
+  margin-top: -4px;
+}
+.iban-display .iban-lbl { color: var(--text-tertiary); font-size: 11px; margin-bottom: 2px; }
+.iban-display .iban-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-primary); }
+
+/* Notification banner */
+.notif-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+}
+.notif-icon-wrap {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.notif-icon-wrap i { width: 20px; height: 20px; color: var(--text-secondary); }
+
+/* Card background element */
+.card-bg {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.ctrl-btn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid #333;
+  background: #1a1a1a;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.ctrl-btn:hover { color: #ccc; border-color: #555; }
+.ctrl-btn.active { background: var(--accent); color: var(--accent-dark); border-color: var(--accent); }
+
+.flow-nav {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  justify-content: center;
+}
+.flow-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #333;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.flow-dot.active { background: var(--accent); width: 24px; border-radius: 4px; }
+
+@media (max-width: 430px) {
+  .phone-frame { border-radius: 0; width: 100vw; height: 100vh; height: 100dvh; box-shadow: none; }
+  body { background: var(--bg-primary); }
+  .controls, .flow-nav { display: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="phone-container">
+  <div class="controls" id="topControls">
+    <button class="ctrl-btn active" onclick="switchLang('en')" id="btnEN">English</button>
+    <button class="ctrl-btn" onclick="switchLang('ar')" id="btnAR">العربية</button>
+    <span style="color:#444;padding:0 4px">|</span>
+    <button class="ctrl-btn active" onclick="switchFlow('onboarding')" data-flow="onboarding">Onboarding</button>
+    <button class="ctrl-btn" onclick="switchFlow('home')" data-flow="home">Home</button>
+    <button class="ctrl-btn" onclick="switchFlow('transfer')" data-flow="transfer">Transfer</button>
+    <button class="ctrl-btn" onclick="switchFlow('cards')" data-flow="cards">Cards</button>
+    <button class="ctrl-btn" onclick="switchFlow('money')" data-flow="money">Add Money</button>
+    <button class="ctrl-btn" onclick="switchFlow('exchange')" data-flow="exchange">Exchange</button>
+    <button class="ctrl-btn" onclick="switchFlow('settings')" data-flow="settings">Settings</button>
+  </div>
+
+  <div class="phone-frame" id="phone">
+
+<!-- ===================== PIN SCREEN ===================== -->
+<div class="screen bg-solid active" id="screen-pin" data-flow="onboarding" data-step="0">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:0;">
+    <div style="padding:0 4px;">
+      <button class="back-btn" onclick="goBack()" style="margin-bottom:16px;"><i data-lucide="chevron-left"></i></button>
+      <div class="step-text" data-en="Step 1 of 10" data-ar="الخطوة ١ من ١٠">Step 1 of 10</div>
+      <h2 style="font-size:26px;font-weight:700;margin:8px 0;" data-en="Set your PIN" data-ar="أنشئ رمز PIN">Set your PIN</h2>
+      <p style="font-size:14px;color:var(--text-secondary);" data-en="Create a 6-digit PIN to secure your account" data-ar="أنشئ رمز PIN مكون من ٦ أرقام لتأمين حسابك">Create a 6-digit PIN to secure your account</p>
+    </div>
+    <div class="pin-display" id="pinDisplay1"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
+    <div style="flex:1;"></div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pressPin(1)">1</button><button class="pin-key" onclick="pressPin(2)">2</button><button class="pin-key" onclick="pressPin(3)">3</button>
+      <button class="pin-key" onclick="pressPin(4)">4</button><button class="pin-key" onclick="pressPin(5)">5</button><button class="pin-key" onclick="pressPin(6)">6</button>
+      <button class="pin-key" onclick="pressPin(7)">7</button><button class="pin-key" onclick="pressPin(8)">8</button><button class="pin-key" onclick="pressPin(9)">9</button>
+      <button class="pin-key empty"></button><button class="pin-key" onclick="pressPin(0)">0</button><button class="pin-key" onclick="deletePin()"><i data-lucide="delete"></i></button>
+    </div>
+    <button class="btn-primary" onclick="nav('screen-confirm-pin')" data-en="Continue" data-ar="متابعة">Continue</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- CONFIRM PIN -->
+<div class="screen bg-solid" id="screen-confirm-pin" data-flow="onboarding" data-step="1">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:0;">
+    <div style="padding:0 4px;">
+      <button class="back-btn" onclick="goBack()" style="margin-bottom:16px;"><i data-lucide="chevron-left"></i></button>
+      <div class="step-text" data-en="Step 2 of 10" data-ar="الخطوة ٢ من ١٠">Step 2 of 10</div>
+      <h2 style="font-size:26px;font-weight:700;margin:8px 0;" data-en="Confirm PIN" data-ar="تأكيد رمز PIN">Confirm PIN</h2>
+      <p style="font-size:14px;color:var(--text-secondary);" data-en="Re-enter your 6-digit PIN" data-ar="أعد إدخال رمز PIN المكون من ٦ أرقام">Re-enter your 6-digit PIN</p>
+    </div>
+    <div class="pin-display" id="pinDisplay2"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
+    <div style="flex:1;"></div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pressPin(1)">1</button><button class="pin-key" onclick="pressPin(2)">2</button><button class="pin-key" onclick="pressPin(3)">3</button>
+      <button class="pin-key" onclick="pressPin(4)">4</button><button class="pin-key" onclick="pressPin(5)">5</button><button class="pin-key" onclick="pressPin(6)">6</button>
+      <button class="pin-key" onclick="pressPin(7)">7</button><button class="pin-key" onclick="pressPin(8)">8</button><button class="pin-key" onclick="pressPin(9)">9</button>
+      <button class="pin-key empty"></button><button class="pin-key" onclick="pressPin(0)">0</button><button class="pin-key" onclick="deletePin()"><i data-lucide="delete"></i></button>
+    </div>
+    <button class="btn-primary" onclick="nav('screen-phone-verify')" data-en="Continue" data-ar="متابعة">Continue</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- PHONE VERIFY -->
+<div class="screen bg-solid" id="screen-phone-verify" data-flow="onboarding" data-step="2">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:24px;">
+    <div>
+      <button class="back-btn" onclick="goBack()" style="margin-bottom:16px;"><i data-lucide="chevron-left"></i></button>
+      <div class="step-text" data-en="Step 3 of 10" data-ar="الخطوة ٣ من ١٠">Step 3 of 10</div>
+      <h2 style="font-size:26px;font-weight:700;margin:8px 0;" data-en="Mobile Verification" data-ar="التحقق من الهاتف">Mobile Verification</h2>
+      <p style="font-size:14px;color:var(--text-secondary);" data-en="We'll send a verification code to your phone number" data-ar="سنرسل رمز التحقق إلى رقم هاتفك">We'll send a verification code to your phone number</p>
+    </div>
+    <div class="input-group"><span class="lbl" data-en="Phone Number" data-ar="رقم الهاتف">Phone Number</span><input class="input-field" type="tel" value="+971 50 123 4567"></div>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-enter-otp')" data-en="Send Code" data-ar="إرسال الرمز">Send Code</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ENTER OTP -->
+<div class="screen bg-solid" id="screen-enter-otp" data-flow="onboarding" data-step="3">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:24px;">
+    <div>
+      <button class="back-btn" onclick="goBack()" style="margin-bottom:16px;"><i data-lucide="chevron-left"></i></button>
+      <div class="step-text" data-en="Step 4 of 10" data-ar="الخطوة ٤ من ١٠">Step 4 of 10</div>
+      <h2 style="font-size:26px;font-weight:700;margin:8px 0;" data-en="Enter the Code" data-ar="أدخل الرمز">Enter the Code</h2>
+      <p style="font-size:14px;color:var(--text-secondary);" data-en="We sent a code to +971 50 123 4567" data-ar="أرسلنا رمزاً إلى ٤٥٦٧ ١٢٣ ٥٠ ٩٧١+">We sent a code to +971 50 123 4567</p>
+    </div>
+    <div class="otp-row"><div class="otp-box filled">4</div><div class="otp-box filled">8</div><div class="otp-box filled">2</div><div class="otp-box">_</div><div class="otp-box"></div><div class="otp-box"></div></div>
+    <p style="font-size:13px;color:var(--text-secondary);text-align:center;" data-en="Resend code in 0:45" data-ar="إعادة الإرسال خلال ٠:٤٥">Resend code in 0:45</p>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-address')" data-en="Verify" data-ar="تحقق">Verify</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ADDRESS -->
+<div class="screen bg-solid" id="screen-address" data-flow="onboarding" data-step="4">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:24px;">
+    <div>
+      <button class="back-btn" onclick="goBack()" style="margin-bottom:16px;"><i data-lucide="chevron-left"></i></button>
+      <div class="step-text" data-en="Step 5 of 10" data-ar="الخطوة ٥ من ١٠">Step 5 of 10</div>
+      <h2 style="font-size:26px;font-weight:700;margin:8px 0;" data-en="Residential address" data-ar="عنوان السكن">Residential address</h2>
+      <p style="font-size:14px;color:var(--text-secondary);" data-en="Select your country of residence" data-ar="اختر بلد إقامتك">Select your country of residence</p>
+    </div>
+    <div class="input-group" style="position:relative;"><span class="input-float-label" data-en="Country" data-ar="البلد">Country</span><div class="input-field" style="padding-top:28px;display:flex;justify-content:space-between;align-items:center;"><span data-en="United Arab Emirates" data-ar="الإمارات العربية المتحدة">United Arab Emirates</span><i data-lucide="chevron-down" style="width:16px;height:16px;color:var(--text-tertiary);"></i></div></div>
+    <div class="input-group" style="position:relative;"><span class="input-float-label" data-en="City" data-ar="المدينة">City</span><div class="input-field" style="padding-top:28px;display:flex;justify-content:space-between;align-items:center;"><span data-en="Dubai" data-ar="دبي">Dubai</span><i data-lucide="chevron-down" style="width:16px;height:16px;color:var(--text-tertiary);"></i></div></div>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-scan-id')" data-en="Continue" data-ar="متابعة">Continue</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- SCAN ID -->
+<div class="screen bg-solid" id="screen-scan-id" data-flow="onboarding" data-step="5">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:24px;align-items:center;justify-content:center;">
+    <button class="back-btn" onclick="goBack()" style="align-self:flex-start;"><i data-lucide="chevron-left"></i></button>
+    <div class="step-text" style="text-align:center;" data-en="Step 6 of 10" data-ar="الخطوة ٦ من ١٠">Step 6 of 10</div>
+    <h2 style="font-size:26px;font-weight:700;text-align:center;" data-en="Scan your ID" data-ar="مسح بطاقة الهوية">Scan your ID</h2>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;" data-en="Position your Emirates ID within the frame" data-ar="ضع بطاقة الهوية الإماراتية داخل الإطار">Position your Emirates ID within the frame</p>
+    <div style="width:280px;height:180px;border:2px dashed var(--accent);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:24px 0;"><i data-lucide="scan-line" style="width:48px;height:48px;color:var(--accent);"></i></div>
+    <p style="font-size:13px;color:var(--text-secondary);text-align:center;" data-en="Make sure the ID is well-lit and fully visible" data-ar="تأكد من أن البطاقة مضاءة جيداً وظاهرة بالكامل">Make sure the ID is well-lit and fully visible</p>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-face-scan')" style="width:100%;" data-en="Scan ID" data-ar="مسح الهوية">Scan ID</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- FACE SCAN -->
+<div class="screen bg-solid" id="screen-face-scan" data-flow="onboarding" data-step="6">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:24px;align-items:center;justify-content:center;">
+    <button class="back-btn" onclick="goBack()" style="align-self:flex-start;"><i data-lucide="chevron-left"></i></button>
+    <div class="step-text" style="text-align:center;" data-en="Step 7 of 10" data-ar="الخطوة ٧ من ١٠">Step 7 of 10</div>
+    <h2 style="font-size:26px;font-weight:700;text-align:center;" data-en="KYC Face Scan" data-ar="مسح الوجه">KYC Face Scan</h2>
+    <div style="width:180px;height:180px;border:3px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:16px 0;"><i data-lucide="scan-face" style="width:64px;height:64px;color:var(--accent);"></i></div>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;" data-en="Position your face within the circle" data-ar="ضع وجهك داخل الدائرة">Position your face within the circle</p>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-enable-faceid')" style="width:100%;" data-en="Start Scan" data-ar="بدء المسح">Start Scan</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ENABLE FACE ID -->
+<div class="screen bg-solid" id="screen-enable-faceid" data-flow="onboarding" data-step="7">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:24px;align-items:center;justify-content:center;">
+    <div style="width:100px;height:100px;border:3px solid var(--accent);border-radius:24px;display:flex;align-items:center;justify-content:center;"><i data-lucide="scan-face" style="width:48px;height:48px;color:var(--accent);"></i></div>
+    <h2 style="font-size:26px;font-weight:700;text-align:center;" data-en="Enable Face ID" data-ar="تفعيل Face ID">Enable Face ID</h2>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;max-width:300px;" data-en="Use Face ID for quick and secure access to your Wafrpay account" data-ar="استخدم Face ID للوصول السريع والآمن إلى حسابك في وفرباي">Use Face ID for quick and secure access to your Wafrpay account</p>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-enable-notif')" data-en="Enable Face ID" data-ar="تفعيل Face ID">Enable Face ID</button>
+    <button class="btn-ghost" onclick="nav('screen-enable-notif')" data-en="Skip for now" data-ar="تخطي الآن">Skip for now</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ENABLE NOTIFICATIONS -->
+<div class="screen bg-solid" id="screen-enable-notif" data-flow="onboarding" data-step="8">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:24px;align-items:center;justify-content:center;">
+    <div style="width:100px;height:100px;border:3px solid var(--accent);border-radius:24px;display:flex;align-items:center;justify-content:center;"><i data-lucide="bell" style="width:48px;height:48px;color:var(--accent);"></i></div>
+    <h2 style="font-size:26px;font-weight:700;text-align:center;" data-en="Enable Notifications" data-ar="تفعيل الإشعارات">Enable Notifications</h2>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;max-width:300px;" data-en="Stay updated on transfers, payments, and account activity" data-ar="ابقَ على اطلاع على التحويلات والمدفوعات ونشاط الحساب">Stay updated on transfers, payments, and account activity</p>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-all-set')" data-en="Enable Notifications" data-ar="تفعيل الإشعارات">Enable Notifications</button>
+    <button class="btn-ghost" onclick="nav('screen-all-set')" data-en="Skip for now" data-ar="تخطي الآن">Skip for now</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ALL SET -->
+<div class="screen bg-solid" id="screen-all-set" data-flow="onboarding" data-step="9">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:20px;align-items:center;justify-content:center;">
+    <div class="success-circle"><i data-lucide="check"></i></div>
+    <h2 style="font-size:28px;font-weight:700;text-align:center;" data-en="You're all set!" data-ar="أنت جاهز!">You're all set!</h2>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;max-width:300px;" data-en="Welcome to Wafrpay. Your Shariah-compliant wallet is ready to use." data-ar="مرحباً بك في وفرباي. محفظتك المتوافقة مع الشريعة الإسلامية جاهزة للاستخدام.">Welcome to Wafrpay. Your Shariah-compliant wallet is ready to use.</p>
+    <div class="card-bg" style="width:100%;">
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;"><i data-lucide="wallet" style="width:20px;height:20px;color:var(--accent);flex-shrink:0;"></i><div><div style="font-size:14px;font-weight:600;" data-en="Multi-currency wallet" data-ar="محفظة متعددة العملات">Multi-currency wallet</div><div style="font-size:12px;color:var(--text-secondary);" data-en="Hold AED, USD, EUR, GBP & more" data-ar="بالعملات AED و USD و EUR و GBP والمزيد">Hold AED, USD, EUR, GBP & more</div></div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;"><i data-lucide="send" style="width:20px;height:20px;color:var(--accent);flex-shrink:0;"></i><div><div style="font-size:14px;font-weight:600;" data-en="Instant transfers" data-ar="تحويلات فورية">Instant transfers</div><div style="font-size:12px;color:var(--text-secondary);" data-en="Send money globally in seconds" data-ar="أرسل أموالك حول العالم في ثوانٍ">Send money globally in seconds</div></div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;"><i data-lucide="credit-card" style="width:20px;height:20px;color:var(--accent);flex-shrink:0;"></i><div><div style="font-size:14px;font-weight:600;" data-en="Virtual & physical cards" data-ar="بطاقات افتراضية وفعلية">Virtual & physical cards</div><div style="font-size:12px;color:var(--text-secondary);" data-en="Shariah-compliant debit cards" data-ar="بطاقات خصم متوافقة مع الشريعة">Shariah-compliant debit cards</div></div></div>
+    </div>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="switchFlow('home')" data-en="Get Started" data-ar="ابدأ الآن">Get Started</button>
+    <button class="btn-ghost" data-en="Explore Wafrpay" data-ar="استكشف وفرباي">Explore Wafrpay</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ===================== HOME ===================== -->
+<div class="screen" id="screen-home" data-flow="home" data-step="0">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="home-hdr">
+    <div class="home-logo">W</div>
+    <div class="home-actions">
+      <button class="hdr-icon-btn"><i data-lucide="bell"></i></button>
+      <div class="hdr-profile-pic"><i data-lucide="user"></i></div>
+    </div>
+  </div>
+  <div class="content" style="gap:24px;padding-top:12px;">
+    <div class="balance-card">
+      <div class="bal-label" data-en="Total Balance" data-ar="الرصيد الإجمالي">Total Balance</div>
+      <div class="bal-amount" data-en="AED 15,230.50" data-ar="د.إ 15,230.50">AED 15,230.50</div>
+      <div class="bal-change"><i data-lucide="trending-up"></i><span data-en="+2.4% this month" data-ar="+٢.٤٪ هذا الشهر">+2.4% this month</span></div>
+    </div>
+    <div>
+      <div class="section-hdr">
+        <span class="sec-title" data-en="My Wallets" data-ar="محافظي">My Wallets</span>
+        <span class="sec-link" data-en="See All" data-ar="عرض الكل">See All</span>
+      </div>
+      <div class="wallets-scroll">
+        <div class="wallet-card"><div class="wc-flag-row"><div class="wc-flag">🇦🇪</div><span class="wc-code">AED</span></div><span class="wc-amount">8,200.00</span></div>
+        <div class="wallet-card"><div class="wc-flag-row"><div class="wc-flag">🇺🇸</div><span class="wc-code">USD</span></div><span class="wc-amount">1,250.00</span></div>
+        <div class="wallet-card"><div class="wc-flag-row"><div class="wc-flag">🇵🇰</div><span class="wc-code">PKR</span></div><span class="wc-amount">45,000.00</span></div>
+      </div>
+    </div>
+    <div class="quick-actions">
+      <button class="qa-btn" onclick="switchFlow('money')"><div class="qa-icon"><i data-lucide="plus"></i></div><span class="qa-label" data-en="Add Money" data-ar="إضافة أموال">Add Money</span></button>
+      <button class="qa-btn" onclick="switchFlow('transfer')"><div class="qa-icon"><i data-lucide="send"></i></div><span class="qa-label" data-en="Send" data-ar="إرسال">Send</span></button>
+      <button class="qa-btn" onclick="switchFlow('cards')"><div class="qa-icon"><i data-lucide="credit-card"></i></div><span class="qa-label" data-en="Card" data-ar="البطاقات">Card</span></button>
+      <button class="qa-btn" onclick="switchFlow('exchange')"><div class="qa-icon"><i data-lucide="arrow-left-right"></i></div><span class="qa-label" data-en="Exchange" data-ar="تحويل">Exchange</span></button>
+    </div>
+    <div class="promo-banner" onclick="switchFlow('transfer')">
+      <div class="promo-icon"><i data-lucide="zap"></i></div>
+      <div><div style="font-size:14px;font-weight:600;" data-en="Send money instantly" data-ar="أرسل الأموال فوراً">Send money instantly</div><div style="font-size:12px;color:var(--text-secondary);" data-en="Zero fees on your first 3 transfers" data-ar="بدون رسوم على أول ٣ تحويلات">Zero fees on your first 3 transfers</div></div>
+    </div>
+    <div>
+      <div class="section-hdr"><span class="sec-title" style="font-style:italic;" data-en="Recent Activity" data-ar="النشاط الأخير">Recent Activity</span><span class="sec-link" data-en="See All" data-ar="عرض الكل">See All</span></div>
+      <div class="tx-item"><div class="tx-icon"><i data-lucide="shopping-cart"></i></div><div class="tx-info"><div class="tx-name" data-en="Carrefour" data-ar="كارفور">Carrefour</div><div class="tx-meta" data-en="Today, 2:30 PM" data-ar="اليوم، ٢:٣٠ م">Today, 2:30 PM</div></div><div class="tx-right"><div class="tx-amount">-AED 234.50</div><div class="tx-status" data-en="Completed" data-ar="مكتمل">Completed</div></div></div>
+      <div class="tx-item"><div class="tx-icon"><i data-lucide="send"></i></div><div class="tx-info"><div class="tx-name" data-en="Mahmoud Khan" data-ar="محمود خان">Mahmoud Khan</div><div class="tx-meta" data-en="Yesterday" data-ar="أمس">Yesterday</div></div><div class="tx-right"><div class="tx-amount">-AED 1,500.00</div><div class="tx-status" data-en="Completed" data-ar="مكتمل">Completed</div></div></div>
+      <div class="tx-item"><div class="tx-icon"><i data-lucide="arrow-down-left"></i></div><div class="tx-info"><div class="tx-name" data-en="Salary - ADCB" data-ar="راتب - ADCB">Salary - ADCB</div><div class="tx-meta" data-en="Mar 15" data-ar="١٥ مارس">Mar 15</div></div><div class="tx-right"><div class="tx-amount" style="color:var(--accent);">+AED 12,500</div><div class="tx-status" data-en="Completed" data-ar="مكتمل">Completed</div></div></div>
+    </div>
+  </div>
+  <div class="tab-bar-wrap"><div class="tab-bar">
+    <button class="tab-item active" onclick="switchFlow('home')"><i data-lucide="house"></i><span data-en="HOME" data-ar="الرئيسية">HOME</span></button>
+    <button class="tab-item" onclick="switchFlow('transfer')"><i data-lucide="send"></i><span data-en="SEND" data-ar="إرسال">SEND</span></button>
+    <button class="tab-item" onclick="switchFlow('cards')"><i data-lucide="credit-card"></i><span data-en="CARDS" data-ar="البطاقات">CARDS</span></button>
+    <button class="tab-item" onclick="switchFlow('settings')"><i data-lucide="life-buoy"></i><span data-en="HELP" data-ar="المزيد">HELP</span></button>
+  </div></div>
+</div>
+
+<!-- ===================== TRANSFER: CHOOSE RECIPIENT ===================== -->
+<div class="screen" id="screen-recipients" data-flow="transfer" data-step="0">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" data-en="Send Money" data-ar="إرسال الأموال">Send Money</span><div class="spacer"></div></div>
+  <div class="content" style="gap:16px;">
+    <p style="font-size:14px;color:var(--text-secondary);" data-en="Who are you sending to?" data-ar="إلى من ترسل؟">Who are you sending to?</p>
+    <div style="display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border-primary);border-radius:12px;padding:12px 16px;"><i data-lucide="search" style="width:16px;height:16px;color:var(--text-tertiary);flex-shrink:0;"></i><span style="color:var(--text-tertiary);font-size:14px;" data-en="Search by name, phone, or IBAN..." data-ar="ابحث بالاسم أو الهاتف أو الايبان...">Search by name, phone, or IBAN...</span></div>
+    <div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;" data-en="Recent" data-ar="الأخيرة">Recent</p>
+      <div style="display:flex;gap:20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;" onclick="nav('screen-amount')"><div class="avatar">MK</div><span style="font-size:11px;color:var(--text-secondary);" data-en="Mahmoud" data-ar="محمود">Mahmoud</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;" onclick="nav('screen-amount')"><div class="avatar">SM</div><span style="font-size:11px;color:var(--text-secondary);" data-en="Sara" data-ar="سارة">Sara</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;" onclick="nav('screen-amount')"><div class="avatar">FR</div><span style="font-size:11px;color:var(--text-secondary);" data-en="Fatima" data-ar="فاطمة">Fatima</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;" onclick="nav('screen-amount')"><div class="avatar">MH</div><span style="font-size:11px;color:var(--text-secondary);" data-en="Mohammed" data-ar="محمد">Mohammed</span></div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;" data-en="All Contacts" data-ar="جميع جهات الاتصال">All Contacts</p>
+      <div class="contact-row" onclick="nav('screen-amount')"><div class="avatar">MK</div><div class="contact-info"><div class="contact-name" data-en="Mahmoud Khan" data-ar="محمود خان">Mahmoud Khan</div><div class="contact-sub">HBL Pakistan · PKR</div></div></div>
+      <div class="contact-row" onclick="nav('screen-amount')"><div class="avatar">SM</div><div class="contact-info"><div class="contact-name" data-en="Sara Mirza" data-ar="سارة ميرزا">Sara Mirza</div><div class="contact-sub">ENBD UAE · AED</div></div></div>
+      <div class="contact-row" onclick="nav('screen-amount')"><div class="avatar">FR</div><div class="contact-info"><div class="contact-name" data-en="Fatima Rashid" data-ar="فاطمة راشد">Fatima Rashid</div><div class="contact-sub">SBI India · INR</div></div></div>
+      <div class="contact-row" onclick="nav('screen-amount')"><div class="avatar">MH</div><div class="contact-info"><div class="contact-name" data-en="Mohammed Hassan" data-ar="محمد حسن">Mohammed Hassan</div><div class="contact-sub">MCB Pakistan · PKR</div></div></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:1px dashed var(--border-primary);border-radius:12px;cursor:pointer;color:var(--accent);" onclick="nav('screen-amount')"><i data-lucide="user-plus" style="width:16px;height:16px;"></i><span style="font-size:14px;font-weight:500;" data-en="Add new recipient" data-ar="إضافة مستلم جديد">Add new recipient</span></div>
+  </div>
+  <div class="tab-bar-wrap"><div class="tab-bar">
+    <button class="tab-item" onclick="switchFlow('home')"><i data-lucide="house"></i><span data-en="HOME" data-ar="الرئيسية">HOME</span></button>
+    <button class="tab-item active"><i data-lucide="send"></i><span data-en="SEND" data-ar="إرسال">SEND</span></button>
+    <button class="tab-item" onclick="switchFlow('cards')"><i data-lucide="credit-card"></i><span data-en="CARDS" data-ar="البطاقات">CARDS</span></button>
+    <button class="tab-item" onclick="switchFlow('settings')"><i data-lucide="life-buoy"></i><span data-en="HELP" data-ar="المزيد">HELP</span></button>
+  </div></div>
+</div>
+
+<!-- TRANSFER: AMOUNT -->
+<div class="screen" id="screen-amount" data-flow="transfer" data-step="1">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" data-en="Send Money" data-ar="إرسال الأموال">Send Money</span><div class="spacer"></div></div>
+  <div class="content" style="gap:14px;">
+    <div style="display:flex;align-items:center;gap:12px;padding-bottom:8px;"><div class="avatar">MK</div><div><div style="font-size:15px;font-weight:600;" data-en="Mahmoud Khan" data-ar="محمود خان">Mahmoud Khan</div><div style="font-size:12px;color:var(--text-secondary);">HBL Pakistan · PKR</div></div></div>
+    <div><div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;" data-en="You send" data-ar="أنت ترسل">You send</div><div class="amount-display"><div class="cur-select"><span class="cur-flag">🇦🇪</span><span>AED</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);"></i></div><div class="amount-val">1,500.00</div></div><div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" data-en="Available: AED 2,450.00" data-ar="المتاح: د.إ ٢٬٤٥٠.٠٠">Available: AED 2,450.00</div></div>
+    <div style="display:flex;justify-content:center;"><button class="swap-btn"><i data-lucide="arrow-up-down"></i></button></div>
+    <div><div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;" data-en="They receive" data-ar="يتلقى">They receive</div><div class="amount-display"><div class="cur-select"><span class="cur-flag">🇵🇰</span><span>PKR</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);"></i></div><div class="amount-val">114,630.00</div></div></div>
+    <div class="review-row"><span class="rlbl" data-en="Exchange rate" data-ar="سعر الصرف">Exchange rate</span><span class="rval">1 AED = 76.42 PKR</span></div>
+    <div class="review-row"><span class="rlbl" data-en="Transfer fee" data-ar="رسوم التحويل">Transfer fee</span><span class="rval">AED 3.50</span></div>
+    <div class="review-row"><span class="rlbl" data-en="Total cost" data-ar="التكلفة الإجمالية">Total cost</span><span class="rval" style="font-weight:700;">AED 1,503.50</span></div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);"><i data-lucide="clock" style="width:14px;height:14px;"></i><span data-en="Estimated delivery ~2 minutes" data-ar="التسليم المقدر ~٢ دقيقة">Estimated delivery ~2 minutes</span></div>
+    <div class="savings-card">
+      <div class="savings-hdr"><i data-lucide="check-circle"></i><span data-en="Save with Wafr" data-ar="وفر مع وفر">Save with Wafr</span></div>
+      <div class="review-row"><span class="rlbl" data-en="Exchange house" data-ar="محل الصرافة">Exchange house</span><span class="rval">AED 1,546.00</span></div>
+      <div class="review-row"><span class="rlbl">Wafr</span><span class="rval highlight">AED 1,503.50</span></div>
+      <div class="savings-total" data-en="You save AED 42.50 on this transfer" data-ar="وفرت د.إ ٤٢.٥٠ على هذا التحويل">You save AED 42.50 on this transfer</div>
+    </div>
+  </div>
+  <div style="padding:0 20px 8px;flex-shrink:0;"><button class="btn-primary" onclick="nav('screen-review')" data-en="Continue" data-ar="متابعة">Continue</button></div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- TRANSFER: REVIEW -->
+<div class="screen" id="screen-review" data-flow="transfer" data-step="2">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" data-en="Review Transfer" data-ar="مراجعة التحويل">Review Transfer</span><div class="spacer"></div></div>
+  <div class="content" style="gap:16px;">
+    <div style="display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--border-secondary);"><div class="avatar">MK</div><div><div style="font-size:15px;font-weight:600;" data-en="Mahmoud Khan" data-ar="محمود خان">Mahmoud Khan</div><div style="font-size:11px;color:var(--text-secondary);">HBL Pakistan · PK36HABB0012348678901234</div></div></div>
+    <div class="card-bg">
+      <div class="review-row"><span class="rlbl" data-en="You send" data-ar="أنت ترسل">You send</span><span class="rval">AED 1,500.00</span></div>
+      <div class="review-row"><span class="rlbl" data-en="Exchange rate" data-ar="سعر الصرف">Exchange rate</span><span class="rval">1 AED = 76.42 PKR</span></div>
+      <div class="review-row"><span class="rlbl" data-en="Transfer fee" data-ar="رسوم التحويل">Transfer fee</span><span class="rval">AED 3.50</span></div>
+      <div class="review-row"><span class="rlbl" data-en="They receive" data-ar="يتلقى">They receive</span><span class="rval highlight">PKR 114,630.00</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><i data-lucide="clock" style="width:14px;height:14px;"></i><span data-en="Estimated delivery ~2 minutes" data-ar="التسليم المقدر ~٢ دقيقة">Estimated delivery ~2 minutes</span></div>
+    <div class="savings-card">
+      <div class="savings-hdr"><i data-lucide="check-circle"></i><span data-en="Save with Wafr" data-ar="وفر مع وفر">Save with Wafr</span></div>
+      <div class="review-row"><span class="rlbl" data-en="Exchange house" data-ar="محل الصرافة">Exchange house</span><span class="rval">AED 1,546.00</span></div>
+      <div class="review-row"><span class="rlbl">Wafr</span><span class="rval highlight">AED 1,503.50</span></div>
+      <div class="savings-total" data-en="You save AED 42.50 on this transfer" data-ar="وفرت د.إ ٤٢.٥٠ على هذا التحويل">You save AED 42.50 on this transfer</div>
+    </div>
+    <div class="shariah-badge"><i data-lucide="shield-check" style="width:16px;height:16px;"></i><span data-en="Shariah-compliant transfer" data-ar="تحويل متوافق مع الشريعة">Shariah-compliant transfer</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 0;"><i data-lucide="scan-face" style="width:40px;height:40px;color:var(--text-secondary);"></i><span style="font-size:13px;color:var(--text-secondary);" data-en="Confirm with biometrics" data-ar="تأكيد بالبصمة">Confirm with biometrics</span></div>
+    <button class="btn-primary" onclick="nav('screen-tx-success')"><span data-en="Confirm Transfer" data-ar="تأكيد التحويل">Confirm Transfer</span> <i data-lucide="send" style="width:16px;height:16px;"></i></button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- TRANSFER SUCCESS -->
+<div class="screen" id="screen-tx-success" data-flow="transfer" data-step="3">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:20px;align-items:center;justify-content:center;">
+    <div class="success-circle"><i data-lucide="check"></i></div>
+    <h2 style="font-size:24px;font-weight:700;text-align:center;" data-en="Transfer Initiated!" data-ar="تم بدء التحويل!">Transfer Initiated!</h2>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;" data-en="We'll notify you when it arrives" data-ar="سنبلغك عند وصوله">We'll notify you when it arrives</p>
+    <div class="card-bg" style="width:100%;text-align:center;">
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;" data-en="Tracking Reference" data-ar="رقم المرجع">Tracking Reference</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;letter-spacing:1px;">WFR-2026-0317-AK4829</div>
+    </div>
+    <div style="font-size:13px;color:var(--text-secondary);" data-en="Amount sent" data-ar="المبلغ المرسل">Amount sent</div>
+    <div style="font-size:14px;color:var(--accent);font-weight:600;">AED 1,500.00 → PKR 114,630.00</div>
+    <button class="btn-secondary" style="margin-top:12px;"><i data-lucide="share-2" style="width:16px;height:16px;"></i><span data-en="Share Details" data-ar="مشاركة التفاصيل">Share Details</span></button>
+    <button class="btn-primary" onclick="nav('screen-track')" data-en="Done" data-ar="تم">Done</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- TRACK TRANSFER -->
+<div class="screen" id="screen-track" data-flow="transfer" data-step="4">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" data-en="Track Transfer" data-ar="تتبع التحويل">Track Transfer</span><div class="spacer"></div></div>
+  <div class="content" style="gap:20px;">
+    <div class="card-bg">
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px;">AED 1,500.00 → PKR 114,630.00</div>
+      <div style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;"><i data-lucide="map-pin" style="width:12px;height:12px;"></i><span data-en="To: Mahmoud Khan · HBL Pakistan" data-ar="إلى: محمود خان · HBL باكستان">To: Mahmoud Khan · HBL Pakistan</span></div>
+      <div style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;margin-top:4px;"><i data-lucide="hash" style="width:12px;height:12px;"></i><span>Ref: WFR-2026-0317-AK4829</span></div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title" data-en="Processing" data-ar="قيد المعالجة">Processing</div><div class="tl-time">Mar 17, 2026 · 10:32 AM</div><div class="tl-desc" data-en="Transfer initiated and being processed" data-ar="تم بدء التحويل وجاري المعالجة">Transfer initiated and being processed</div></div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title" data-en="Sent" data-ar="تم الإرسال">Sent</div><div class="tl-time">Mar 17, 2026 · 10:33 AM</div><div class="tl-desc" data-en="Funds sent to recipient's bank" data-ar="تم إرسال الأموال إلى بنك المستلم">Funds sent to recipient's bank</div></div></div>
+      <div class="tl-item"><div class="tl-dot pending"></div><div><div class="tl-title" style="color:var(--text-secondary);" data-en="Delivered" data-ar="تم التسليم">Delivered</div><div class="tl-desc" data-en="Waiting for confirmation" data-ar="في انتظار التأكيد">Waiting for confirmation</div></div></div>
+    </div>
+    <div class="notif-banner"><div class="notif-icon-wrap"><i data-lucide="bell-ring"></i></div><div><div style="font-size:14px;font-weight:500;" data-en="Push notifications enabled" data-ar="الإشعارات مفعّلة">Push notifications enabled</div><div style="font-size:12px;color:var(--text-secondary);" data-en="You'll be notified when delivered" data-ar="سيتم إبلاغك عند التسليم">You'll be notified when delivered</div></div></div>
+  </div>
+  <div class="tab-bar-wrap"><div class="tab-bar">
+    <button class="tab-item" onclick="switchFlow('home')"><i data-lucide="house"></i><span data-en="HOME" data-ar="الرئيسية">HOME</span></button>
+    <button class="tab-item active"><i data-lucide="send"></i><span data-en="SEND" data-ar="إرسال">SEND</span></button>
+    <button class="tab-item" onclick="switchFlow('cards')"><i data-lucide="credit-card"></i><span data-en="CARDS" data-ar="البطاقات">CARDS</span></button>
+    <button class="tab-item" onclick="switchFlow('settings')"><i data-lucide="life-buoy"></i><span data-en="HELP" data-ar="المزيد">HELP</span></button>
+  </div></div>
+</div>
+
+<!-- ===================== CARDS ===================== -->
+<div class="screen" id="screen-cards" data-flow="cards" data-step="0">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><span style="font-size:24px;font-weight:700;" data-en="Cards" data-ar="البطاقات">Cards</span><div style="flex:1;"></div><button class="btn-sm-green" onclick="nav('screen-order-card')"><i data-lucide="plus" style="width:14px;height:14px;"></i><span data-en="New Card" data-ar="بطاقة جديدة">New Card</span></button></div>
+  <div class="content" style="gap:20px;">
+    <div class="credit-card"><div class="cc-name">Wafr</div><div class="cc-brand">VISA</div><div class="cc-number">•••• •••• •••• 4829</div><div class="cc-expiry">12/28</div><div class="cc-holder">MAHMOUD AL RASHID</div><div class="cc-currency">AED</div></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="font-size:13px;color:var(--text-secondary);" data-en="Spending power" data-ar="القدرة الشرائية">Spending power</span><span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;">AED 8,200.00</span></div>
+    <div class="credit-card" style="opacity:0.6;padding:16px;"><div class="cc-name" style="font-size:13px;">Wafr</div><div class="cc-brand" style="font-size:14px;">VISA</div><div class="cc-number" style="font-size:14px;">•••• 7213</div><div class="cc-currency" style="font-size:11px;">USD</div></div>
+    <div class="card-actions">
+      <button class="card-action-btn"><i data-lucide="snowflake"></i><span data-en="Freeze" data-ar="تجميد">Freeze</span></button>
+      <button class="card-action-btn"><i data-lucide="settings"></i><span data-en="Settings" data-ar="إعدادات">Settings</span></button>
+      <button class="card-action-btn"><i data-lucide="smartphone"></i><span data-en="Apple Pay" data-ar="Apple Pay">Apple Pay</span></button>
+    </div>
+  </div>
+  <div class="tab-bar-wrap"><div class="tab-bar">
+    <button class="tab-item" onclick="switchFlow('home')"><i data-lucide="house"></i><span data-en="HOME" data-ar="الرئيسية">HOME</span></button>
+    <button class="tab-item" onclick="switchFlow('transfer')"><i data-lucide="send"></i><span data-en="SEND" data-ar="إرسال">SEND</span></button>
+    <button class="tab-item active"><i data-lucide="credit-card"></i><span data-en="CARDS" data-ar="البطاقات">CARDS</span></button>
+    <button class="tab-item" onclick="switchFlow('settings')"><i data-lucide="life-buoy"></i><span data-en="HELP" data-ar="المزيد">HELP</span></button>
+  </div></div>
+</div>
+
+<!-- ===================== ORDER CARD ===================== -->
+<div class="screen" id="screen-order-card" data-flow="cards" data-step="1">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" data-en="Order Virtual Card" data-ar="طلب بطاقة افتراضية">Order Virtual Card</span><div class="spacer"></div></div>
+  <div class="content" style="gap:24px;">
+    <!-- Card preview -->
+    <div class="credit-card" style="min-height:170px;">
+      <div class="cc-name" style="font-size:16px;">Wafr v1.0.0</div>
+      <div class="cc-brand">VISA</div>
+      <div style="font-size:13px;color:var(--text-tertiary);margin-top:24px;" data-en="Your card number will appear here" data-ar="سيظهر رقم بطاقتك هنا">Your card number will appear here</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">
+        <span style="font-size:12px;color:var(--text-tertiary);letter-spacing:1px;">YOUR NAME</span>
+        <span style="font-size:12px;padding:6px 12px;border:1px solid var(--border-primary);border-radius:6px;color:var(--text-secondary);" data-en="Instant issue" data-ar="إصدار فوري">Instant issue</span>
+      </div>
+    </div>
+
+    <!-- Link to currency wallet -->
+    <div>
+      <div style="font-size:14px;font-weight:500;margin-bottom:12px;" data-en="Link to currency wallet" data-ar="ربط بمحفظة العملة">Link to currency wallet</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div id="wallet-aed" class="wallet-select-row selected" onclick="selectWallet('aed')">
+          <div style="display:flex;align-items:center;gap:12px;flex:1;">
+            <span class="cur-flag">🇦🇪</span>
+            <div>
+              <div style="font-size:15px;font-weight:600;" data-en="UAE Dirham (AED)" data-ar="درهم إماراتي (AED)">UAE Dirham (AED)</div>
+              <div style="font-size:12px;color:var(--text-secondary);" data-en="Balance: AED 8,200.00" data-ar="الرصيد: AED 8,200.00">Balance: AED 8,200.00</div>
+            </div>
+          </div>
+          <div class="wallet-check"><i data-lucide="check-circle-2" style="width:20px;height:20px;color:var(--accent);"></i></div>
+        </div>
+        <div id="wallet-usd" class="wallet-select-row" onclick="selectWallet('usd')">
+          <div style="display:flex;align-items:center;gap:12px;flex:1;">
+            <span class="cur-flag">🇺🇸</span>
+            <div>
+              <div style="font-size:15px;font-weight:600;" data-en="US Dollar (USD)" data-ar="دولار أمريكي (USD)">US Dollar (USD)</div>
+              <div style="font-size:12px;color:var(--text-secondary);" data-en="Balance: USD 1,250.00" data-ar="الرصيد: USD 1,250.00">Balance: USD 1,250.00</div>
+            </div>
+          </div>
+          <div class="wallet-check"></div>
+        </div>
+        <div id="wallet-pkr" class="wallet-select-row" onclick="selectWallet('pkr')">
+          <div style="display:flex;align-items:center;gap:12px;flex:1;">
+            <span class="cur-flag">🇵🇰</span>
+            <div>
+              <div style="font-size:15px;font-weight:600;" data-en="Pakistani Rupee (PKR)" data-ar="روبية باكستانية (PKR)">Pakistani Rupee (PKR)</div>
+              <div style="font-size:12px;color:var(--text-secondary);" data-en="Balance: PKR 45,000.00" data-ar="الرصيد: PKR 45,000.00">Balance: PKR 45,000.00</div>
+            </div>
+          </div>
+          <div class="wallet-check"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-card-ordered')"><i data-lucide="credit-card" style="width:18px;height:18px;"></i><span data-en="Order Card — Free" data-ar="طلب بطاقة — مجاني">Order Card — Free</span></button>
+    <div class="shariah-badge" style="padding-bottom:4px;"><i data-lucide="shield-check" style="width:14px;height:14px;"></i><span data-en="Shariah-compliant virtual card" data-ar="بطاقة افتراضية متوافقة مع الشريعة">Shariah-compliant virtual card</span></div>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- CARD ORDERED SUCCESS -->
+<div class="screen" id="screen-card-ordered" data-flow="cards" data-step="2">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:20px;align-items:center;justify-content:center;">
+    <div class="success-circle"><i data-lucide="check"></i></div>
+    <h2 style="font-size:24px;font-weight:700;text-align:center;" data-en="Card Ordered!" data-ar="تم طلب البطاقة!">Card Ordered!</h2>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;max-width:300px;" data-en="Your virtual card is ready. You can start spending immediately." data-ar="بطاقتك الافتراضية جاهزة. يمكنك البدء بالإنفاق فوراً.">Your virtual card is ready. You can start spending immediately.</p>
+    <div class="credit-card" style="width:100%;">
+      <div class="cc-name">Wafr</div>
+      <div class="cc-brand">VISA</div>
+      <div class="cc-number">•••• •••• •••• 5817</div>
+      <div class="cc-expiry">03/29</div>
+      <div class="cc-holder">MOHAMMED RASHID</div>
+      <div class="cc-currency">AED</div>
+    </div>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="switchFlow('cards')" data-en="Done" data-ar="تم">Done</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ===================== ADD MONEY ===================== -->
+<div class="screen" id="screen-add-money" data-flow="money" data-step="0">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" data-en="Add Money" data-ar="إضافة أموال">Add Money</span><div class="spacer"></div></div>
+  <div class="content" style="gap:16px;">
+    <p style="font-size:14px;color:var(--text-secondary);" data-en="Choose how you'd like to add funds to your wallet" data-ar="اختر كيف تريد إضافة الأموال إلى محفظتك">Choose how you'd like to add funds to your wallet</p>
+    <div class="add-option"><div class="add-opt-icon"><i data-lucide="landmark"></i></div><div class="add-opt-info"><div class="add-opt-title" data-en="Bank Transfer" data-ar="تحويل بنكي">Bank Transfer</div><div class="add-opt-desc" data-en="Free · 1-2 business days" data-ar="مجاني · ١-٢ أيام عمل">Free · 1-2 business days</div></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--text-tertiary);"></i></div>
+    <div class="iban-display"><div class="iban-lbl" data-en="Your IBAN" data-ar="رقم الآيبان">Your IBAN</div><div class="iban-val">AE12 3456 7890 1234 5678 901</div></div>
+    <div class="add-option" onclick="nav('screen-topup')"><div class="add-opt-icon"><i data-lucide="credit-card"></i></div><div class="add-opt-info"><div class="add-opt-title" data-en="Card Top-up" data-ar="شحن بالبطاقة">Card Top-up</div><div class="add-opt-desc" data-en="1.5% fee · Instant" data-ar="رسوم ١.٥٪ · فوري">1.5% fee · Instant</div></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--text-tertiary);"></i></div>
+    <div class="add-option"><div class="add-opt-icon"><i data-lucide="smartphone"></i></div><div class="add-opt-info"><div class="add-opt-title">Apple Pay</div><div class="add-opt-desc" data-en="Free · Instant" data-ar="مجاني · فوري">Free · Instant</div></div><i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--text-tertiary);"></i></div>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- CARD TOPUP -->
+<div class="screen" id="screen-topup" data-flow="money" data-step="1">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" data-en="Card Top-up" data-ar="شحن بالبطاقة">Card Top-up</span><div class="spacer"></div></div>
+  <div class="content" style="gap:20px;">
+    <div><div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;" data-en="Amount" data-ar="المبلغ">Amount</div><div class="amount-display"><div class="cur-select"><span class="cur-flag">🇦🇪</span><span>AED</span></div><div class="amount-val">500.00</div></div></div>
+    <div class="input-group"><span class="lbl" data-en="Card Number" data-ar="رقم البطاقة">Card Number</span><input class="input-field" value="•••• •••• •••• 4532"></div>
+    <div style="display:flex;gap:12px;"><div class="input-group" style="flex:1;"><span class="lbl" data-en="Expiry" data-ar="الانتهاء">Expiry</span><input class="input-field" value="09/27"></div><div class="input-group" style="flex:1;"><span class="lbl">CVV</span><input class="input-field" value="•••"></div></div>
+    <div style="border-top:1px solid var(--border-secondary);padding-top:16px;">
+      <div class="review-row"><span class="rlbl" data-en="Top-up amount" data-ar="مبلغ الشحن">Top-up amount</span><span class="rval">AED 500.00</span></div>
+      <div class="review-row"><span class="rlbl" data-en="Fee (1.5%)" data-ar="الرسوم (١.٥٪)">Fee (1.5%)</span><span class="rval">AED 7.50</span></div>
+      <div class="review-row" style="padding-top:8px;border-top:1px solid var(--border-secondary);margin-top:8px;"><span class="rlbl" style="font-weight:600;color:var(--text-primary);" data-en="Total charge" data-ar="إجمالي الخصم">Total charge</span><span class="rval" style="font-weight:700;">AED 507.50</span></div>
+    </div>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-topup-done')" data-en="Add Money" data-ar="إضافة الأموال">Add Money</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- TOPUP SUCCESS -->
+<div class="screen" id="screen-topup-done" data-flow="money" data-step="2">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:20px;align-items:center;justify-content:center;">
+    <div class="success-circle"><i data-lucide="check"></i></div>
+    <h2 style="font-size:24px;font-weight:700;text-align:center;" data-en="Money Added!" data-ar="تمت إضافة الأموال!">Money Added!</h2>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;" data-en="AED 500.00 has been added to your wallet" data-ar="تم إضافة د.إ ٥٠٠.٠٠ إلى محفظتك">AED 500.00 has been added to your wallet</p>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="switchFlow('home')" data-en="Done" data-ar="تم">Done</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ===================== EXCHANGE ===================== -->
+<div class="screen" id="screen-exchange" data-flow="exchange" data-step="0">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" data-en="Currency Exchange" data-ar="تحويل العملات">Currency Exchange</span><div class="spacer"></div></div>
+  <div class="content" style="gap:14px;">
+    <div><div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;" data-en="From" data-ar="من">From</div><div class="amount-display"><div class="cur-select"><span class="cur-flag">🇦🇪</span><span>AED</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);"></i></div><div class="amount-val">1,000.00</div></div><div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" data-en="Available: AED 2,450.00" data-ar="المتاح: د.إ ٢٬٤٥٠.٠٠">Available: AED 2,450.00</div></div>
+    <div style="display:flex;justify-content:center;"><button class="swap-btn"><i data-lucide="arrow-up-down"></i></button></div>
+    <div><div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;" data-en="To" data-ar="إلى">To</div><div class="amount-display"><div class="cur-select"><span class="cur-flag">🇺🇸</span><span>USD</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--text-tertiary);"></i></div><div class="amount-val">272.26</div></div></div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><i data-lucide="info" style="width:14px;height:14px;"></i><span>1 AED = 0.2723 USD · Updated just now</span></div>
+    <div class="savings-card">
+      <div class="savings-hdr"><i data-lucide="check-circle"></i><span data-en="You save vs exchange houses" data-ar="وفرت مقارنة بمحلات الصرافة">You save vs exchange houses</span></div>
+      <div class="review-row"><span class="rlbl" data-en="Your savings" data-ar="مدخراتك">Your savings</span><span class="rval highlight" style="font-weight:700;">AED 43.00</span></div>
+      <div class="review-row"><span class="rlbl" data-en="Exchange house rate" data-ar="سعر محل الصرافة">Exchange house rate</span><span class="rval">1 AED = 0.2680 USD</span></div>
+      <div class="review-row"><span class="rlbl" data-en="Wafrpay rate" data-ar="سعر وفرباي">Wafrpay rate</span><span class="rval highlight">1 AED = 0.2723 USD</span></div>
+    </div>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="nav('screen-ex-done')" data-en="Convert Now" data-ar="تحويل الآن">Convert Now</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- EXCHANGE SUCCESS -->
+<div class="screen" id="screen-ex-done" data-flow="exchange" data-step="1">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="content" style="gap:20px;align-items:center;justify-content:center;">
+    <div class="success-circle"><i data-lucide="check"></i></div>
+    <h2 style="font-size:24px;font-weight:700;text-align:center;" data-en="Exchange Complete!" data-ar="تم التحويل!">Exchange Complete!</h2>
+    <p style="font-size:14px;color:var(--text-secondary);text-align:center;">AED 1,000.00 → USD 272.26</p>
+    <p style="font-size:13px;color:var(--accent);font-weight:600;" data-en="You saved AED 43.00" data-ar="وفرت د.إ ٤٣.٠٠">You saved AED 43.00</p>
+    <div style="flex:1;"></div>
+    <button class="btn-primary" onclick="switchFlow('home')" data-en="Done" data-ar="تم">Done</button>
+  </div>
+  <div class="safe-area"></div>
+</div>
+
+<!-- ===================== SETTINGS ===================== -->
+<div class="screen" id="screen-settings" data-flow="settings" data-step="0">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div style="text-align:center;padding:16px 20px 0;"><h2 style="font-size:20px;font-weight:600;" data-en="Settings" data-ar="الإعدادات">Settings</h2></div>
+  <div class="content" style="gap:16px;padding-top:8px;">
+    <div class="profile-card">
+      <div class="profile-pic"><i data-lucide="user"></i></div>
+      <div class="profile-name" data-en="Mohammed Rashid" data-ar="محمد راشد">Mohammed Rashid</div>
+      <div class="profile-email">m.rashid@email.com</div>
+      <div class="profile-email">+971 50 123 4567</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-row"><div class="sr-icon"><i data-lucide="user"></i></div><span class="sr-label" data-en="Edit profile" data-ar="تعديل الملف الشخصي">Edit profile</span><div class="sr-chevron"><i data-lucide="chevron-right"></i></div></div>
+      <div class="settings-row"><div class="sr-icon"><i data-lucide="shield"></i></div><span class="sr-label" data-en="Security & biometrics" data-ar="الأمان والمقاييس الحيوية">Security & biometrics</span><div class="sr-chevron"><i data-lucide="chevron-right"></i></div></div>
+      <div class="settings-row"><div class="sr-icon"><i data-lucide="bell"></i></div><span class="sr-label" data-en="Notifications" data-ar="الإشعارات">Notifications</span><div class="sr-chevron"><i data-lucide="chevron-right"></i></div></div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-row" onclick="toggleLang()"><div class="sr-icon"><i data-lucide="globe"></i></div><span class="sr-label" data-en="Language" data-ar="اللغة">Language</span><span class="sr-value" id="langVal" data-en="English" data-ar="العربية">English</span><div class="sr-chevron"><i data-lucide="chevron-right"></i></div></div>
+      <div class="settings-row"><div class="sr-icon"><i data-lucide="palette"></i></div><span class="sr-label" data-en="Appearance" data-ar="المظهر">Appearance</span><span class="sr-value" data-en="Dark" data-ar="داكن">Dark</span><div class="sr-chevron"><i data-lucide="chevron-right"></i></div></div>
+      <div class="settings-row"><div class="sr-icon"><i data-lucide="coins"></i></div><span class="sr-label" data-en="Default currency" data-ar="العملة الافتراضية">Default currency</span><span class="sr-value">AED</span><div class="sr-chevron"><i data-lucide="chevron-right"></i></div></div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-row"><div class="sr-icon"><i data-lucide="help-circle"></i></div><span class="sr-label" data-en="Help & FAQ" data-ar="المساعدة والأسئلة الشائعة">Help & FAQ</span><div class="sr-chevron"><i data-lucide="chevron-right"></i></div></div>
+      <div class="settings-row"><div class="sr-icon"><i data-lucide="file-text"></i></div><span class="sr-label" data-en="Terms & privacy" data-ar="الشروط والخصوصية">Terms & privacy</span><div class="sr-chevron"><i data-lucide="chevron-right"></i></div></div>
+    </div>
+  </div>
+  <div class="tab-bar-wrap"><div class="tab-bar">
+    <button class="tab-item" onclick="switchFlow('home')"><i data-lucide="house"></i><span data-en="Home" data-ar="الرئيسية">Home</span></button>
+    <button class="tab-item" onclick="switchFlow('transfer')"><i data-lucide="send"></i><span data-en="Send" data-ar="إرسال">Send</span></button>
+    <button class="tab-item" onclick="switchFlow('cards')"><i data-lucide="credit-card"></i><span data-en="Cards" data-ar="البطاقات">Cards</span></button>
+    <button class="tab-item active"><i data-lucide="life-buoy"></i><span data-en="More" data-ar="المزيد">More</span></button>
+  </div></div>
+</div>
+
+  </div><!-- phone-frame -->
+  <div class="flow-nav" id="flowNav"></div>
+</div>
+
+<script>
+let lang = 'en', flow = 'onboarding', screen = 'screen-pin', hist = [], pin = '';
+
+const flows = {
+  onboarding: ['screen-pin','screen-confirm-pin','screen-phone-verify','screen-enter-otp','screen-address','screen-scan-id','screen-face-scan','screen-enable-faceid','screen-enable-notif','screen-all-set'],
+  home: ['screen-home'],
+  transfer: ['screen-recipients','screen-amount','screen-review','screen-tx-success','screen-track'],
+  cards: ['screen-cards','screen-order-card','screen-card-ordered'],
+  money: ['screen-add-money','screen-topup','screen-topup-done'],
+  exchange: ['screen-exchange','screen-ex-done'],
+  settings: ['screen-settings']
+};
+
+function nav(id, noHist) {
+  const old = document.querySelector('.screen.active');
+  const nw = document.getElementById(id);
+  if (!nw || old === nw) return;
+  if (!noHist && screen) hist.push(screen);
+  if (old) { old.classList.remove('active'); old.classList.add('slide-out'); setTimeout(() => old.classList.remove('slide-out'), 280); }
+  nw.classList.add('active','slide-in');
+  setTimeout(() => nw.classList.remove('slide-in'), 280);
+  screen = id;
+  updateNav();
+  lucide.createIcons();
+}
+
+function goBack() {
+  if (!hist.length) return;
+  const prev = hist.pop();
+  const old = document.querySelector('.screen.active');
+  const nw = document.getElementById(prev);
+  if (old) old.classList.remove('active');
+  nw.classList.add('active');
+  screen = prev;
+  const sf = nw.getAttribute('data-flow');
+  if (sf && sf !== flow) { flow = sf; updateFlowBtns(); }
+  updateNav();
+  lucide.createIcons();
+}
+
+function switchLang(l) {
+  lang = l;
+  document.body.dir = l === 'ar' ? 'rtl' : 'ltr';
+  document.body.lang = l;
+  document.getElementById('btnEN').classList.toggle('active', l === 'en');
+  document.getElementById('btnAR').classList.toggle('active', l === 'ar');
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const t = el.getAttribute('data-' + l);
+    if (t) { if (el.tagName === 'INPUT') el.placeholder = t; else el.textContent = t; }
+  });
+}
+
+function switchFlow(f) {
+  flow = f; hist = [];
+  updateFlowBtns();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','slide-in','slide-out'));
+  const first = flows[f][0];
+  document.getElementById(first).classList.add('active');
+  screen = first;
+  updateNav();
+  lucide.createIcons();
+}
+
+function updateFlowBtns() {
+  document.querySelectorAll('.ctrl-btn[data-flow]').forEach(b => b.classList.toggle('active', b.getAttribute('data-flow') === flow));
+}
+
+function updateNav() {
+  const n = document.getElementById('flowNav');
+  const s = flows[flow];
+  if (!s || s.length <= 1) { n.innerHTML = ''; return; }
+  const i = s.indexOf(screen);
+  n.innerHTML = s.map((id, j) => `<div class="flow-dot ${j===i?'active':''}" onclick="jumpTo('${id}')"></div>`).join('');
+}
+
+function jumpTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','slide-in','slide-out'));
+  document.getElementById(id).classList.add('active');
+  hist = []; screen = id;
+  updateNav();
+  lucide.createIcons();
+}
+
+function pressPin(n) {
+  if (pin.length >= 6) return;
+  pin += n;
+  const s = document.querySelector('.screen.active');
+  if (!s) return;
+  s.querySelectorAll('.pin-dot').forEach((d,i) => d.classList.toggle('filled', i < pin.length));
+  if (pin.length === 6) {
+    setTimeout(() => {
+      pin = '';
+      if (screen === 'screen-pin') nav('screen-confirm-pin');
+      else if (screen === 'screen-confirm-pin') nav('screen-phone-verify');
+    }, 300);
+  }
+}
+
+function deletePin() {
+  pin = pin.slice(0,-1);
+  const s = document.querySelector('.screen.active');
+  if (s) s.querySelectorAll('.pin-dot').forEach((d,i) => d.classList.toggle('filled', i < pin.length));
+}
+
+function selectWallet(id) {
+  document.querySelectorAll('.wallet-select-row').forEach(r => {
+    r.classList.remove('selected');
+    r.querySelector('.wallet-check').innerHTML = '';
+  });
+  const row = document.getElementById('wallet-' + id);
+  if (row) {
+    row.classList.add('selected');
+    row.querySelector('.wallet-check').innerHTML = '<i data-lucide="check-circle-2" style="width:20px;height:20px;color:var(--accent);"></i>';
+    lucide.createIcons();
+  }
+}
+
+function toggleLang() {
+  switchLang(lang === 'en' ? 'ar' : 'en');
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  updateNav();
+});
+</script>
+</body>
+</html>
