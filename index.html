@@ -1189,9 +1189,9 @@ body[dir="rtl"] .tl-item::before { left: auto; right: 5px; }
         <span class="sec-link" data-en="See All" data-ar="عرض الكل">See All</span>
       </div>
       <div class="wallets-scroll">
-        <div class="wallet-card"><div class="wc-flag-row"><div class="wc-flag">🇦🇪</div><span class="wc-code">AED</span></div><span class="wc-amount">8,200.00</span></div>
-        <div class="wallet-card"><div class="wc-flag-row"><div class="wc-flag">🇺🇸</div><span class="wc-code">USD</span></div><span class="wc-amount">1,250.00</span></div>
-        <div class="wallet-card"><div class="wc-flag-row"><div class="wc-flag">🇵🇰</div><span class="wc-code">PKR</span></div><span class="wc-amount">45,000.00</span></div>
+        <div class="wallet-card" onclick="openWallet('aed')" style="cursor:pointer;"><div class="wc-flag-row"><div class="wc-flag">🇦🇪</div><span class="wc-code">AED</span></div><span class="wc-amount">8,200.00</span></div>
+        <div class="wallet-card" onclick="openWallet('usd')" style="cursor:pointer;"><div class="wc-flag-row"><div class="wc-flag">🇺🇸</div><span class="wc-code">USD</span></div><span class="wc-amount">1,250.00</span></div>
+        <div class="wallet-card" onclick="openWallet('pkr')" style="cursor:pointer;"><div class="wc-flag-row"><div class="wc-flag">🇵🇰</div><span class="wc-code">PKR</span></div><span class="wc-amount">45,000.00</span></div>
       </div>
     </div>
     <div class="quick-actions">
@@ -1209,6 +1209,51 @@ body[dir="rtl"] .tl-item::before { left: auto; right: 5px; }
       <div class="tx-item"><div class="tx-icon"><i data-lucide="shopping-cart"></i></div><div class="tx-info"><div class="tx-name" data-en="Carrefour" data-ar="كارفور">Carrefour</div><div class="tx-meta" data-en="Today, 2:30 PM" data-ar="اليوم، ٢:٣٠ م">Today, 2:30 PM</div></div><div class="tx-right"><div class="tx-amount">-AED 234.50</div><div class="tx-status" data-en="Completed" data-ar="مكتمل">Completed</div></div></div>
       <div class="tx-item"><div class="tx-icon"><i data-lucide="send"></i></div><div class="tx-info"><div class="tx-name" data-en="Mahmoud Khan" data-ar="محمود خان">Mahmoud Khan</div><div class="tx-meta" data-en="Yesterday" data-ar="أمس">Yesterday</div></div><div class="tx-right"><div class="tx-amount">-AED 1,500.00</div><div class="tx-status" data-en="Completed" data-ar="مكتمل">Completed</div></div></div>
       <div class="tx-item"><div class="tx-icon"><i data-lucide="arrow-down-left"></i></div><div class="tx-info"><div class="tx-name" data-en="Salary - ADCB" data-ar="راتب - ADCB">Salary - ADCB</div><div class="tx-meta" data-en="Mar 15" data-ar="١٥ مارس">Mar 15</div></div><div class="tx-right"><div class="tx-amount" style="color:var(--accent);">+AED 12,500</div><div class="tx-status" data-en="Completed" data-ar="مكتمل">Completed</div></div></div>
+    </div>
+  </div>
+  <div class="tab-bar-wrap"><div class="tab-bar">
+    <button class="tab-item active" onclick="switchFlow('home')"><i data-lucide="house"></i><span data-en="HOME" data-ar="الرئيسية">HOME</span></button>
+    <button class="tab-item" onclick="switchFlow('transfer')"><i data-lucide="send"></i><span data-en="SEND" data-ar="إرسال">SEND</span></button>
+    <button class="tab-item" onclick="switchFlow('cards')"><i data-lucide="credit-card"></i><span data-en="CARDS" data-ar="البطاقات">CARDS</span></button>
+    <button class="tab-item" onclick="switchFlow('settings')"><i data-lucide="life-buoy"></i><span data-en="HELP" data-ar="المزيد">HELP</span></button>
+  </div></div>
+</div>
+
+<!-- ===================== WALLET DETAIL ===================== -->
+<div class="screen" id="screen-wallet" data-flow="home" data-step="1">
+  <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><i data-lucide="chevron-left"></i></button><span class="title" id="wallet-title">AED Wallet</span><div class="spacer"></div></div>
+  <div class="content" style="gap:20px;">
+    <!-- Balance -->
+    <div style="text-align:center;padding:8px 0 4px;">
+      <div id="wallet-flag" style="font-size:40px;margin-bottom:8px;">🇦🇪</div>
+      <div id="wallet-balance" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:600;letter-spacing:-1px;">AED 8,200.00</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;" id="wallet-subtitle" data-en="UAE Dirham" data-ar="درهم إماراتي">UAE Dirham</div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="quick-actions" style="padding:4px 0;">
+      <button class="qa-btn" onclick="switchFlow('money')"><div class="qa-icon" style="width:44px;height:44px;"><i data-lucide="plus" style="width:20px;height:20px;"></i></div><span class="qa-label" data-en="Add Money" data-ar="إضافة أموال">Add Money</span></button>
+      <button class="qa-btn" onclick="switchFlow('transfer')"><div class="qa-icon" style="width:44px;height:44px;"><i data-lucide="send" style="width:20px;height:20px;"></i></div><span class="qa-label" data-en="Send" data-ar="إرسال">Send</span></button>
+      <button class="qa-btn" onclick="switchFlow('exchange')"><div class="qa-icon" style="width:44px;height:44px;"><i data-lucide="arrow-left-right" style="width:20px;height:20px;"></i></div><span class="qa-label" data-en="Exchange" data-ar="تحويل">Exchange</span></button>
+    </div>
+
+    <!-- Frequent recipients -->
+    <div id="wallet-recipients">
+      <div class="section-hdr"><span class="sec-title" data-en="Frequent Recipients" data-ar="المستلمون المتكررون">Frequent Recipients</span></div>
+      <div style="display:flex;gap:20px;padding:4px 0;" id="wallet-freq-row">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;" onclick="switchFlow('transfer')"><div class="avatar">MK</div><span style="font-size:11px;color:var(--text-secondary);">Mahmoud</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;" onclick="switchFlow('transfer')"><div class="avatar">SM</div><span style="font-size:11px;color:var(--text-secondary);">Sara</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;" onclick="switchFlow('transfer')"><div class="avatar">FR</div><span style="font-size:11px;color:var(--text-secondary);">Fatima</span></div>
+      </div>
+    </div>
+
+    <!-- Transactions -->
+    <div>
+      <div class="section-hdr"><span class="sec-title" data-en="Transactions" data-ar="المعاملات">Transactions</span><span class="sec-link" data-en="Filter" data-ar="تصفية">Filter</span></div>
+      <div id="wallet-transactions">
+        <!-- Populated by JS -->
+      </div>
     </div>
   </div>
   <div class="tab-bar-wrap"><div class="tab-bar">
@@ -1573,7 +1618,7 @@ let lang = 'en', flow = 'onboarding', screen = 'screen-pin', hist = [], pin = ''
 
 const flows = {
   onboarding: ['screen-pin','screen-confirm-pin','screen-phone-verify','screen-enter-otp','screen-address','screen-scan-id','screen-face-scan','screen-enable-faceid','screen-enable-notif','screen-all-set'],
-  home: ['screen-home'],
+  home: ['screen-home','screen-wallet'],
   transfer: ['screen-recipients','screen-amount','screen-review','screen-tx-success','screen-track'],
   cards: ['screen-cards','screen-order-card','screen-card-ordered'],
   money: ['screen-add-money','screen-topup','screen-topup-done'],
@@ -1670,6 +1715,93 @@ function deletePin() {
   pin = pin.slice(0,-1);
   const s = document.querySelector('.screen.active');
   if (s) s.querySelectorAll('.pin-dot').forEach((d,i) => d.classList.toggle('filled', i < pin.length));
+}
+
+const walletData = {
+  aed: {
+    flag: '🇦🇪', code: 'AED', name: { en: 'UAE Dirham', ar: 'درهم إماراتي' },
+    balance: '8,200.00',
+    recipients: [
+      { initials: 'MK', name: 'Mahmoud' },
+      { initials: 'SM', name: 'Sara' },
+      { initials: 'FR', name: 'Fatima' }
+    ],
+    transactions: [
+      { icon: 'shopping-cart', name: { en: 'Carrefour', ar: 'كارفور' }, date: { en: 'Today, 2:30 PM', ar: 'اليوم، ٢:٣٠ م' }, amount: '-AED 234.50', status: 'Completed', statusAr: 'مكتمل', color: '' },
+      { icon: 'send', name: { en: 'Mahmoud Khan', ar: 'محمود خان' }, date: { en: 'Today, 10:32 AM', ar: 'اليوم، ١٠:٣٢ ص' }, amount: '-AED 1,500.00', status: 'Completed', statusAr: 'مكتمل', color: '' },
+      { icon: 'arrow-down-left', name: { en: 'Salary - ADCB', ar: 'راتب - ADCB' }, date: { en: 'Mar 15', ar: '١٥ مارس' }, amount: '+AED 12,500.00', status: 'Completed', statusAr: 'مكتمل', color: 'var(--accent)' },
+      { icon: 'shopping-cart', name: { en: 'ADNOC Fuel', ar: 'أدنوك وقود' }, date: { en: 'Mar 14', ar: '١٤ مارس' }, amount: '-AED 180.00', status: 'Completed', statusAr: 'مكتمل', color: '' },
+      { icon: 'arrow-left-right', name: { en: 'Exchange → USD', ar: 'تحويل ← USD' }, date: { en: 'Mar 13', ar: '١٣ مارس' }, amount: '-AED 1,000.00', status: 'Converted', statusAr: 'تم التحويل', color: '' },
+      { icon: 'shopping-cart', name: { en: 'Noon.com', ar: 'نون.كوم' }, date: { en: 'Mar 12', ar: '١٢ مارس' }, amount: '-AED 349.00', status: 'Completed', statusAr: 'مكتمل', color: '' },
+      { icon: 'send', name: { en: 'Sara Mirza', ar: 'سارة ميرزا' }, date: { en: 'Mar 10', ar: '١٠ مارس' }, amount: '-AED 500.00', status: 'Completed', statusAr: 'مكتمل', color: '' }
+    ]
+  },
+  usd: {
+    flag: '🇺🇸', code: 'USD', name: { en: 'US Dollar', ar: 'دولار أمريكي' },
+    balance: '1,250.00',
+    recipients: [
+      { initials: 'FR', name: 'Fatima' },
+      { initials: 'MH', name: 'Mohammed' }
+    ],
+    transactions: [
+      { icon: 'arrow-left-right', name: { en: 'Exchange ← AED', ar: 'تحويل → AED' }, date: { en: 'Mar 13', ar: '١٣ مارس' }, amount: '+USD 272.26', status: 'Converted', statusAr: 'تم التحويل', color: 'var(--accent)' },
+      { icon: 'arrow-down-left', name: { en: 'Freelance Payment', ar: 'دفعة عمل حر' }, date: { en: 'Mar 8', ar: '٨ مارس' }, amount: '+USD 850.00', status: 'Completed', statusAr: 'مكتمل', color: 'var(--accent)' },
+      { icon: 'shopping-cart', name: { en: 'Amazon.com', ar: 'أمازون.كوم' }, date: { en: 'Mar 5', ar: '٥ مارس' }, amount: '-USD 67.99', status: 'Completed', statusAr: 'مكتمل', color: '' },
+      { icon: 'send', name: { en: 'Fatima Rashid', ar: 'فاطمة راشد' }, date: { en: 'Mar 1', ar: '١ مارس' }, amount: '-USD 200.00', status: 'Completed', statusAr: 'مكتمل', color: '' }
+    ]
+  },
+  pkr: {
+    flag: '🇵🇰', code: 'PKR', name: { en: 'Pakistani Rupee', ar: 'روبية باكستانية' },
+    balance: '45,000.00',
+    recipients: [
+      { initials: 'MK', name: 'Mahmoud' },
+      { initials: 'MH', name: 'Mohammed' }
+    ],
+    transactions: [
+      { icon: 'send', name: { en: 'Mahmoud Khan', ar: 'محمود خان' }, date: { en: 'Mar 17', ar: '١٧ مارس' }, amount: '-PKR 114,630.00', status: 'Processing', statusAr: 'قيد المعالجة', color: 'var(--warning)' },
+      { icon: 'arrow-left-right', name: { en: 'Exchange ← AED', ar: 'تحويل → AED' }, date: { en: 'Mar 10', ar: '١٠ مارس' }, amount: '+PKR 76,420.00', status: 'Converted', statusAr: 'تم التحويل', color: 'var(--accent)' },
+      { icon: 'send', name: { en: 'Mohammed Hassan', ar: 'محمد حسن' }, date: { en: 'Feb 28', ar: '٢٨ فبراير' }, amount: '-PKR 25,000.00', status: 'Completed', statusAr: 'مكتمل', color: '' },
+      { icon: 'arrow-down-left', name: { en: 'Family Transfer', ar: 'تحويل عائلي' }, date: { en: 'Feb 20', ar: '٢٠ فبراير' }, amount: '+PKR 50,000.00', status: 'Completed', statusAr: 'مكتمل', color: 'var(--accent)' }
+    ]
+  }
+};
+
+function openWallet(id) {
+  const w = walletData[id];
+  if (!w) return;
+  const l = lang;
+
+  // Header
+  document.getElementById('wallet-title').textContent = w.code + (l === 'en' ? ' Wallet' : ' محفظة');
+  document.getElementById('wallet-flag').textContent = w.flag;
+  document.getElementById('wallet-balance').textContent = w.code + ' ' + w.balance;
+  const sub = document.getElementById('wallet-subtitle');
+  sub.textContent = w.name[l];
+  sub.setAttribute('data-en', w.name.en);
+  sub.setAttribute('data-ar', w.name.ar);
+
+  // Frequent recipients
+  const freqRow = document.getElementById('wallet-freq-row');
+  freqRow.innerHTML = w.recipients.map(r =>
+    `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;" onclick="switchFlow('transfer')"><div class="avatar">${r.initials}</div><span style="font-size:11px;color:var(--text-secondary);">${r.name}</span></div>`
+  ).join('');
+
+  // Transactions
+  const txWrap = document.getElementById('wallet-transactions');
+  txWrap.innerHTML = w.transactions.map(tx => {
+    const txName = tx.name[l];
+    const txDate = tx.date[l];
+    const txStatus = l === 'ar' ? tx.statusAr : tx.status;
+    const amtColor = tx.color ? `color:${tx.color};` : '';
+    const statusColor = tx.color || 'var(--accent)';
+    return `<div class="tx-item">
+      <div class="tx-icon"><i data-lucide="${tx.icon}"></i></div>
+      <div class="tx-info"><div class="tx-name">${txName}</div><div class="tx-meta">${txDate}</div></div>
+      <div class="tx-right"><div class="tx-amount" style="${amtColor}">${tx.amount}</div><div class="tx-status" style="color:${statusColor};">${txStatus}</div></div>
+    </div>`;
+  }).join('');
+
+  nav('screen-wallet');
 }
 
 function selectWallet(id) {
